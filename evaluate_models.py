@@ -13,6 +13,7 @@ my_parser.add_argument("--model_name", "-model_name", type=str, action="store", 
 my_parser.add_argument("--hf_token", "-hf_token", type=str, action="store")
 my_parser.add_argument("--dataset_name", "-dataset_name", type=str, action="store", default = "google/fleurs")
 my_parser.add_argument("--split", "-split", type=str, action="store", default = "test")
+my_parser.add_argument("--subset", "-subset", type=str, action="store")
 
 args = my_parser.parse_args()
 try:
@@ -23,11 +24,11 @@ except:
 
 dataset_name = args.dataset_name 
 model_name = args.model_name
-subset = "ar"
+subset = args.subset
 text_column = "sentence"
 if dataset_name == "google/fleurs":
-  subset = "ar_eg"
   text_column = "transcription"
+  
 print(f"Evaluating {args.model_name} on {args.dataset_name} [{subset}]")
 
 
