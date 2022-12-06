@@ -1,5 +1,10 @@
-datasets>=2.6.1
+torch>=1.7
+torchaudio
 git+https://github.com/huggingface/transformers
+git+https://github.com/huggingface/datasets
 librosa
-evaluate>=0.30
 jiwer
+evaluate>=0.3.0
+more-itertools
+tensorboard
+bitsandbytes
