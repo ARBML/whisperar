@@ -29,7 +29,7 @@ python run_speech_recognition_seq2seq_streaming.py \
 --gradient_checkpointing \
 --fp16 \
 --overwrite_output_dir \
---optim "adamw_bnb_8bit"
+--optim="adamw_bnb_8bit" \
 --do_train \
 --do_eval \
 --predict_with_generate \

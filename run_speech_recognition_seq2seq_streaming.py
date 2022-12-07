@@ -50,7 +50,8 @@ from transformers.trainer_utils import get_last_checkpoint, is_main_process
 from transformers.utils import check_min_version, send_example_telemetry
 from transformers.utils.versions import require_version
 from transformers.models.whisper.english_normalizer import BasicTextNormalizer
-
+import os
+os.environ['LD_LIBRARY_PATH'] = '/usr/lib/x86_64-linux-gnu'
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
 check_min_version("4.25.0.dev0")
 
@@ -412,6 +413,7 @@ def main():
         revision=model_args.model_revision,
         use_auth_token=True if model_args.use_auth_token else None,
     )
+    model.config.use_cache = False
 
     if model.config.decoder_start_token_id is None:
         raise ValueError("Make sure that `config.decoder_start_token_id` is correctly defined")
