@@ -9,3 +9,4 @@ cd $2
 cp ../run_speech_recognition_seq2seq_streaming.py .
 cp ../run_speech_recognition_seq2seq.py .
 cp ../run.sh .
+wget https://raw.githubusercontent.com/huggingface/community-events/main/whisper-fine-tuning-event/fine-tune-whisper-non-streaming.ipynb
