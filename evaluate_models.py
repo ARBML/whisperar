@@ -52,7 +52,7 @@ def prepare_dataset(batch):
     batch["labels"] = tokenizer(batch[text_column]).input_ids
     return batch
 
-test_dataset = test_dataset.map(prepare_dataset, num_proc = 2)
+test_dataset = test_dataset.map(prepare_dataset)
 
 model = model.to("cuda")
 model.config.forced_decoder_ids = processor.get_decoder_prompt_ids(language = "ar", task = "transcribe")
