@@ -45,9 +45,9 @@ MGB2 provides and XML file corresponding to every wav file, which contains the t
 
 To host mgb2 at HF, at least 3 things need to happen:
 
-1- Create the dataset repository on HF. This was created privately at arbml/mgb2_speech for the dataset
-2- Data must be hosted somewhere or uploaded to HF repo
-3- HF loading script must be written so the data can be integrated into the HF hub.
+1. Create the dataset repository on HF. This was created privately at arbml/mgb2_speech for the dataset
+2. Data must be hosted somewhere or uploaded to HF repo
+3. HF loading script must be written so the data can be integrated into the HF hub.
 
 
 ### Uploading the data
@@ -74,6 +74,6 @@ Only the training data was split using this scheme, the test and validation data
 
 The loading script determines the features of the data based on split and selected configuration. We had test, dev, and train split with a single language configuration. Using the _generate_example function, the script is used by GH to correctly produce the associated transcript and wav files. The function works as follows:
 
-1- Go through all the entries in the archive containing the text transcripts and create a map where the name of the file (the 64base encoded one) is used as the key and the transcript at the value
-2- Iterate through all the wav files in all the archive, and for every wav file, get the corresponding transcript from the map constructed in previous step (using the file name) and yield the wav file, transcript, and path to the wav file
+1. Go through all the entries in the archive containing the text transcripts and create a map where the name of the file (the 64base encoded one) is used as the key and the transcript at the value
+2. Iterate through all the wav files in all the archive, and for every wav file, get the corresponding transcript from the map constructed in previous step (using the file name) and yield the wav file, transcript, and path to the wav file
 
