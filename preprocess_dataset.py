@@ -30,7 +30,7 @@ dataset_name = args.dataset_name
 model_name = args.model_name
 subset = args.subset
 hf_token = args.hf_token
-
+login(hf_token)
 text_column = "sentence"
 if dataset_name == "google/fleurs":
     text_column = "transcription"
