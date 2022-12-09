@@ -24,6 +24,8 @@ def get_text(sample):
         return sample["normalized_text"]
     elif "transcript" in sample:
         return sample["transcript"]
+    elif "transcription" in sample:
+        return sample["transcription"]
     else:
         raise ValueError(
             f"Expected transcript column of either 'text', 'sentence', 'normalized_text' or 'transcript'. Got sample of "
