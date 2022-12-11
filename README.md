@@ -22,7 +22,7 @@ bash setup_lib.sh HF_USER_NAME MODEL_NAME
 After that, you can run training by 
 
 ```
-cd MODEL_NAME_HUB
+cd MODEL_NAME
 bash run.sh
 ```
 
