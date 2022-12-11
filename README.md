@@ -16,14 +16,14 @@ bash setup_env.sh
 Then setup the libraries, this will install transofrmers, etc. and create a directory in the hub for training the model ... 
 
 ```bash
-bash setup_lib.sh HF_USER_NAME MODEL_NAME
+bash setup_libs.sh HF_USER_NAME MODEL_NAME
 ```
 
 After that, you can run training by 
 
 ```
 cd MODEL_NAME
-bash run.sh
+bash run_mgb2.sh
 ```
 
 ## evaluation 
