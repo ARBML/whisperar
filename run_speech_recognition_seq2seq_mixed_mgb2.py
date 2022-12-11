@@ -28,7 +28,7 @@ from typing import Any, Dict, List, Optional, Union
 
 import datasets
 import torch
-from datasets import IterableDatasetDict, interleave_datasets, load_dataset
+from datasets import DatasetDict, IterableDatasetDict, interleave_datasets, load_dataset
 from torch.utils.data import IterableDataset
 
 import evaluate
@@ -45,17 +45,20 @@ from transformers import (
     TrainerCallback,
     set_seed,
 )
+from transformers.models.whisper.english_normalizer import BasicTextNormalizer
 from transformers.trainer_pt_utils import IterableDatasetShard
 from transformers.trainer_utils import get_last_checkpoint, is_main_process
 from transformers.utils import check_min_version, send_example_telemetry
 from transformers.utils.versions import require_version
-from transformers.models.whisper.english_normalizer import BasicTextNormalizer
-import os
-os.environ['LD_LIBRARY_PATH'] = '/usr/lib/x86_64-linux-gnu'
+
+
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
 check_min_version("4.25.0.dev0")
 
-require_version("datasets>=1.18.2", "To fix: pip install -r examples/pytorch/speech-recognition/requirements.txt")
+require_version(
+    "datasets>=1.18.2",
+    "To fix: pip install -r examples/pytorch/speech-recognition/requirements.txt",
+)
 
 logger = logging.getLogger(__name__)
 
@@ -67,28 +70,45 @@ class ModelArguments:
     """
 
     model_name_or_path: str = field(
-        metadata={"help": "Path to pretrained model or model identifier from huggingface.co/models"}
+        metadata={
+            "help": "Path to pretrained model or model identifier from huggingface.co/models"
+        }
     )
     config_name: Optional[str] = field(
-        default=None, metadata={"help": "Pretrained config name or path if not the same as model_name"}
+        default=None,
+        metadata={
+            "help": "Pretrained config name or path if not the same as model_name"
+        },
     )
     tokenizer_name: Optional[str] = field(
-        default=None, metadata={"help": "Pretrained tokenizer name or path if not the same as model_name"}
+        default=None,
+        metadata={
+            "help": "Pretrained tokenizer name or path if not the same as model_name"
+        },
     )
     feature_extractor_name: Optional[str] = field(
-        default=None, metadata={"help": "feature extractor name or path if not the same as model_name"}
+        default=None,
+        metadata={
+            "help": "feature extractor name or path if not the same as model_name"
+        },
     )
     cache_dir: Optional[str] = field(
         default=None,
-        metadata={"help": "Where to store the pretrained models downloaded from huggingface.co"},
+        metadata={
+            "help": "Where to store the pretrained models downloaded from huggingface.co"
+        },
     )
     use_fast_tokenizer: bool = field(
         default=True,
-        metadata={"help": "Whether to use one of the fast tokenizer (backed by the tokenizers library) or not."},
+        metadata={
+            "help": "Whether to use one of the fast tokenizer (backed by the tokenizers library) or not."
+        },
     )
     model_revision: str = field(
         default="main",
-        metadata={"help": "The specific model version to use (can be a branch name, tag name or commit id)."},
+        metadata={
+            "help": "The specific model version to use (can be a branch name, tag name or commit id)."
+        },
     )
     use_auth_token: bool = field(
         default=False,
@@ -100,10 +120,12 @@ class ModelArguments:
         },
     )
     freeze_feature_encoder: bool = field(
-        default=True, metadata={"help": "Whether to freeze the feature encoder layers of the model."}
+        default=True,
+        metadata={"help": "Whether to freeze the feature encoder layers of the model."},
     )
     freeze_encoder: bool = field(
-        default=False, metadata={"help": "Whether to freeze the entire encoder of the seq2seq model."}
+        default=False,
+        metadata={"help": "Whether to freeze the entire encoder of the seq2seq model."},
     )
     forced_decoder_ids: List[List[int]] = field(
         default=None,
@@ -116,9 +138,12 @@ class ModelArguments:
         },
     )
     suppress_tokens: List[int] = field(
-        default=None, metadata={"help": "A list of tokens that will be suppressed at generation."}
+        default=None,
+        metadata={"help": "A list of tokens that will be suppressed at generation."},
     )
-    model_index_name: str = field(default=None, metadata={"help": "Pretty name for the model card."})
+    model_index_name: str = field(
+        default=None, metadata={"help": "Pretty name for the model card."}
+    )
 
 
 @dataclass
@@ -128,14 +153,20 @@ class DataTrainingArguments:
     """
 
     dataset_name: str = field(
-        default=None, metadata={"help": "The name of the dataset to use (via the datasets library)."}
+        default=None,
+        metadata={"help": "The name of the dataset to use (via the datasets library)."},
     )
     dataset_config_name: Optional[str] = field(
-        default=None, metadata={"help": "The configuration name of the dataset to use (via the datasets library)."}
+        default=None,
+        metadata={
+            "help": "The configuration name of the dataset to use (via the datasets library)."
+        },
     )
     text_column: Optional[str] = field(
         default=None,
-        metadata={"help": "The name of the column in the datasets containing the full texts (for summarization)."},
+        metadata={
+            "help": "The name of the column in the datasets containing the full texts (for summarization)."
+        },
     )
     max_train_samples: Optional[int] = field(
         default=None,
@@ -157,11 +188,15 @@ class DataTrainingArguments:
     )
     audio_column_name: str = field(
         default="audio",
-        metadata={"help": "The name of the dataset column containing the audio data. Defaults to 'audio'"},
+        metadata={
+            "help": "The name of the dataset column containing the audio data. Defaults to 'audio'"
+        },
     )
     text_column_name: str = field(
         default="text",
-        metadata={"help": "The name of the dataset column containing the text data. Defaults to 'text'"},
+        metadata={
+            "help": "The name of the dataset column containing the text data. Defaults to 'text'"
+        },
     )
     max_duration_in_seconds: float = field(
         default=20.0,
@@ -173,7 +208,10 @@ class DataTrainingArguments:
         },
     )
     min_duration_in_seconds: float = field(
-        default=0.0, metadata={"help": "Filter audio files that are shorter than `min_duration_in_seconds` seconds"}
+        default=0.0,
+        metadata={
+            "help": "Filter audio files that are shorter than `min_duration_in_seconds` seconds"
+        },
     )
     train_split_name: str = field(
         default="train",
@@ -197,7 +235,9 @@ class DataTrainingArguments:
     )
     do_normalize_eval: bool = field(
         default=True,
-        metadata={"help": "Whether to normalise the references and predictions in the eval WER calculation."},
+        metadata={
+            "help": "Whether to normalise the references and predictions in the eval WER calculation."
+        },
     )
     language: str = field(
         default=None,
@@ -210,7 +250,9 @@ class DataTrainingArguments:
     )
     task: str = field(
         default="transcribe",
-        metadata={"help": "Task, either `transcribe` for speech recognition or `translate` for speech translation."},
+        metadata={
+            "help": "Task, either `transcribe` for speech recognition or `translate` for speech translation."
+        },
     )
     shuffle_buffer_size: Optional[int] = field(
         default=500,
@@ -219,6 +261,12 @@ class DataTrainingArguments:
                 "The number of streamed examples to download before shuffling them. The large the buffer, "
                 "the closer it is to real offline shuffling."
             )
+        },
+    )
+    streaming: bool = field(
+        default=True,
+        metadata={
+            "help": "Whether to use streaming mode to load and pre-process the data."
         },
     )
 
@@ -237,19 +285,27 @@ class DataCollatorSpeechSeq2SeqWithPadding:
     processor: Any
     decoder_start_token_id: int
 
-    def __call__(self, features: List[Dict[str, Union[List[int], torch.Tensor]]]) -> Dict[str, torch.Tensor]:
+    def __call__(
+        self, features: List[Dict[str, Union[List[int], torch.Tensor]]]
+    ) -> Dict[str, torch.Tensor]:
         # split inputs and labels since they have to be of different lengths and need
         # different padding methods
         model_input_name = self.processor.model_input_names[0]
-        input_features = [{model_input_name: feature[model_input_name]} for feature in features]
+        input_features = [
+            {model_input_name: feature[model_input_name]} for feature in features
+        ]
         label_features = [{"input_ids": feature["labels"]} for feature in features]
 
-        batch = self.processor.feature_extractor.pad(input_features, return_tensors="pt")
+        batch = self.processor.feature_extractor.pad(
+            input_features, return_tensors="pt"
+        )
 
         labels_batch = self.processor.tokenizer.pad(label_features, return_tensors="pt")
 
         # replace padding with -100 to ignore loss correctly
-        labels = labels_batch["input_ids"].masked_fill(labels_batch.attention_mask.ne(1), -100)
+        labels = labels_batch["input_ids"].masked_fill(
+            labels_batch.attention_mask.ne(1), -100
+        )
 
         # if bos token is appended in previous tokenization step,
         # cut bos token here as it's append later anyways
@@ -261,7 +317,9 @@ class DataCollatorSpeechSeq2SeqWithPadding:
         return batch
 
 
-def load_streaming_dataset(dataset_name, dataset_config_name, split="train", streaming = True, **kwargs):
+def load_maybe_streaming_dataset(
+    dataset_name, dataset_config_name, split="train", streaming=True, **kwargs
+):
     """
     Utility function to load a dataset in streaming mode. For datasets with multiple splits,
     each split is loaded individually and then splits combined by taking alternating examples from
@@ -270,7 +328,13 @@ def load_streaming_dataset(dataset_name, dataset_config_name, split="train", str
     if "+" in split:
         # load multiple splits separated by the `+` symbol with streaming mode
         dataset_splits = [
-            load_dataset(dataset_name, dataset_config_name, split=split_name, streaming=streaming, **kwargs)
+            load_dataset(
+                dataset_name,
+                dataset_config_name,
+                split=split_name,
+                streaming=streaming,
+                **kwargs,
+            )
             for split_name in split.split("+")
         ]
         # interleave multiple splits to form one dataset
@@ -278,7 +342,13 @@ def load_streaming_dataset(dataset_name, dataset_config_name, split="train", str
         return interleaved_dataset
     else:
         # load a single split *with* streaming mode
-        dataset = load_dataset(dataset_name, dataset_config_name, split=split, streaming=streaming, **kwargs)
+        dataset = load_dataset(
+            dataset_name,
+            dataset_config_name,
+            split=split,
+            streaming=streaming,
+            **kwargs,
+        )
         return dataset
 
 
@@ -287,18 +357,24 @@ def main():
     # See all possible arguments in src/transformers/training_args.py
     # or by passing the --help flag to this script.
     # We now keep distinct sets of args, for a cleaner separation of concerns.
-    parser = HfArgumentParser((ModelArguments, DataTrainingArguments, Seq2SeqTrainingArguments))
+    parser = HfArgumentParser(
+        (ModelArguments, DataTrainingArguments, Seq2SeqTrainingArguments)
+    )
 
     if len(sys.argv) == 2 and sys.argv[1].endswith(".json"):
         # If we pass only one argument to the script and it's the path to a json file,
         # let's parse it to get our arguments.
-        model_args, data_args, training_args = parser.parse_json_file(json_file=os.path.abspath(sys.argv[1]))
+        model_args, data_args, training_args = parser.parse_json_file(
+            json_file=os.path.abspath(sys.argv[1])
+        )
     else:
         model_args, data_args, training_args = parser.parse_args_into_dataclasses()
 
     # Sending telemetry. Tracking the example usage helps us better allocate resources to maintain them. The
     # information sent is the one passed as arguments along with your Python/PyTorch versions.
-    send_example_telemetry("run_speech_recognition_seq2seq_streaming", model_args, data_args)
+    send_example_telemetry(
+        "run_speech_recognition_seq2seq_streaming", model_args, data_args
+    )
 
     # 2. Setup logging
     logging.basicConfig(
@@ -313,7 +389,9 @@ def main():
     transformers.utils.logging.enable_default_handler()
     transformers.utils.logging.enable_explicit_format()
 
-    logger.setLevel(logging.INFO if is_main_process(training_args.local_rank) else logging.WARN)
+    logger.setLevel(
+        logging.INFO if is_main_process(training_args.local_rank) else logging.WARN
+    )
 
     # Log on each process the small summary:
     logger.warning(
@@ -329,14 +407,20 @@ def main():
 
     # 3. Detecting last checkpoint and eventually continue from last checkpoint
     last_checkpoint = None
-    if os.path.isdir(training_args.output_dir) and training_args.do_train and not training_args.overwrite_output_dir:
+    if (
+        os.path.isdir(training_args.output_dir)
+        and training_args.do_train
+        and not training_args.overwrite_output_dir
+    ):
         last_checkpoint = get_last_checkpoint(training_args.output_dir)
         if last_checkpoint is None and len(os.listdir(training_args.output_dir)) > 0:
             raise ValueError(
                 f"Output directory ({training_args.output_dir}) already exists and is not empty. "
                 "Use --overwrite_output_dir to overcome."
             )
-        elif last_checkpoint is not None and training_args.resume_from_checkpoint is None:
+        elif (
+            last_checkpoint is not None and training_args.resume_from_checkpoint is None
+        ):
             logger.info(
                 f"Checkpoint detected, resuming training at {last_checkpoint}. To avoid this behavior, change "
                 "the `--output_dir` or add `--overwrite_output_dir` to train from scratch."
@@ -349,20 +433,20 @@ def main():
     raw_datasets = IterableDatasetDict()
 
     if training_args.do_train:
-        raw_datasets["train"] = load_streaming_dataset(
+        raw_datasets["train"] = load_maybe_streaming_dataset(
             data_args.dataset_name,
             data_args.dataset_config_name,
             split=data_args.train_split_name,
-            streaming = True,
+            streaming=True,
             use_auth_token=True if model_args.use_auth_token else None,
         )
 
     if training_args.do_eval:
-        raw_datasets["eval"] = load_streaming_dataset(
+        raw_datasets["eval"] = load_maybe_streaming_dataset(
             "arbml/mgb3",
             data_args.dataset_config_name,
             split="train",
-            streaming = False,
+            streaming=False,
             use_auth_token=True if model_args.use_auth_token else None,
         )
 
@@ -387,22 +471,36 @@ def main():
     # Distributed training:
     # The .from_pretrained methods guarantee that only one local process can concurrently
     config = AutoConfig.from_pretrained(
-        model_args.config_name if model_args.config_name else model_args.model_name_or_path,
+        model_args.config_name
+        if model_args.config_name
+        else model_args.model_name_or_path,
         cache_dir=model_args.cache_dir,
         revision=model_args.model_revision,
         use_auth_token=True if model_args.use_auth_token else None,
     )
 
-    config.update({"forced_decoder_ids": model_args.forced_decoder_ids, "suppress_tokens": model_args.suppress_tokens})
+    config.update(
+        {
+            "forced_decoder_ids": model_args.forced_decoder_ids,
+            "suppress_tokens": model_args.suppress_tokens,
+        }
+    )
+
+    if training_args.gradient_checkpointing:
+        config.update({"use_cache": False})
 
     feature_extractor = AutoFeatureExtractor.from_pretrained(
-        model_args.feature_extractor_name if model_args.feature_extractor_name else model_args.model_name_or_path,
+        model_args.feature_extractor_name
+        if model_args.feature_extractor_name
+        else model_args.model_name_or_path,
         cache_dir=model_args.cache_dir,
         revision=model_args.model_revision,
         use_auth_token=True if model_args.use_auth_token else None,
     )
     tokenizer = AutoTokenizer.from_pretrained(
-        model_args.tokenizer_name if model_args.tokenizer_name else model_args.model_name_or_path,
+        model_args.tokenizer_name
+        if model_args.tokenizer_name
+        else model_args.model_name_or_path,
         cache_dir=model_args.cache_dir,
         use_fast=model_args.use_fast_tokenizer,
         revision=model_args.model_revision,
@@ -415,10 +513,11 @@ def main():
         revision=model_args.model_revision,
         use_auth_token=True if model_args.use_auth_token else None,
     )
-    model.config.use_cache = False
 
     if model.config.decoder_start_token_id is None:
-        raise ValueError("Make sure that `config.decoder_start_token_id` is correctly defined")
+        raise ValueError(
+            "Make sure that `config.decoder_start_token_id` is correctly defined"
+        )
 
     if model_args.freeze_feature_encoder:
         model.freeze_feature_encoder()
@@ -432,16 +531,25 @@ def main():
         tokenizer.set_prefix_tokens(language=data_args.language, task=data_args.task)
 
     # 6. Resample speech dataset if necessary
-    dataset_sampling_rate = next(iter(raw_datasets.values())).features[data_args.audio_column_name].sampling_rate
+    dataset_sampling_rate = (
+        next(iter(raw_datasets.values()))
+        .features[data_args.audio_column_name]
+        .sampling_rate
+    )
     if dataset_sampling_rate != feature_extractor.sampling_rate:
         raw_datasets = raw_datasets.cast_column(
-            data_args.audio_column_name, datasets.features.Audio(sampling_rate=feature_extractor.sampling_rate)
+            data_args.audio_column_name,
+            datasets.features.Audio(sampling_rate=feature_extractor.sampling_rate),
         )
 
     # 7. Preprocessing the datasets.
     # We need to read the audio files as arrays and tokenize the targets.
-    max_input_length = data_args.max_duration_in_seconds * feature_extractor.sampling_rate
-    min_input_length = data_args.min_duration_in_seconds * feature_extractor.sampling_rate
+    max_input_length = (
+        data_args.max_duration_in_seconds * feature_extractor.sampling_rate
+    )
+    min_input_length = (
+        data_args.min_duration_in_seconds * feature_extractor.sampling_rate
+    )
     audio_column_name = data_args.audio_column_name
     text_column_name = data_args.text_column_name
     model_input_name = feature_extractor.model_input_names[0]
@@ -453,18 +561,26 @@ def main():
         raw_datasets["train"] = raw_datasets["train"].take(data_args.max_train_samples)
 
     if data_args.max_eval_samples is not None:
-        raw_datasets["eval"] = raw_datasets["eval"].select(range(data_args.max_eval_samples))
+        raw_datasets["eval"] = raw_datasets["eval"].select(
+            range(data_args.max_eval_samples)
+        )
 
     def prepare_dataset(batch):
         # process audio
         sample = batch[audio_column_name]
-        inputs = feature_extractor(sample["array"], sampling_rate=sample["sampling_rate"])
+        inputs = feature_extractor(
+            sample["array"], sampling_rate=sample["sampling_rate"]
+        )
         # process audio length
         batch[model_input_name] = inputs.get(model_input_name)[0]
         batch["input_length"] = len(sample["array"])
 
         # process targets
-        input_str = batch[text_column_name].lower() if do_lower_case else batch[text_column_name]
+        input_str = (
+            batch[text_column_name].lower()
+            if do_lower_case
+            else batch[text_column_name]
+        )
         if do_remove_punctuation:
             input_str = normalizer(input_str).strip()
         batch["labels"] = tokenizer(input_str).input_ids
@@ -508,6 +624,13 @@ def main():
         if do_normalize_eval:
             pred_str = [normalizer(pred) for pred in pred_str]
             label_str = [normalizer(label) for label in label_str]
+            # filtering step to only evaluate the samples that correspond to non-zero references:
+            pred_str = [
+                pred_str[i] for i in range(len(pred_str)) if len(label_str[i]) > 0
+            ]
+            label_str = [
+                label_str[i] for i in range(len(label_str)) if len(label_str[i]) > 0
+            ]
 
         wer = 100 * metric.compute(predictions=pred_str, references=label_str)
 
@@ -530,6 +653,7 @@ def main():
 
     # 11. Configure Trainer
     # Trainer callback to reinitialise and reshuffle the streamable datasets at the beginning of each epoch
+    # Only required for streaming: Trainer automatically shuffles non-streaming datasets
     class ShuffleCallback(TrainerCallback):
         def on_epoch_begin(self, args, state, control, train_dataloader, **kwargs):
             if isinstance(train_dataloader.dataset, IterableDatasetShard):
@@ -545,7 +669,9 @@ def main():
         eval_dataset=vectorized_datasets["eval"] if training_args.do_eval else None,
         tokenizer=feature_extractor,
         data_collator=data_collator,
-        compute_metrics=compute_metrics if training_args.predict_with_generate else None,
+        compute_metrics=compute_metrics
+        if training_args.predict_with_generate
+        else None,
         callbacks=[ShuffleCallback()],
     )
 
@@ -590,11 +716,13 @@ def main():
     if data_args.dataset_name is not None:
         kwargs["dataset_tags"] = data_args.dataset_name
         if data_args.dataset_config_name is not None:
-            kwargs["dataset"] = f"{data_args.dataset_name} {data_args.dataset_config_name}"
+            kwargs[
+                "dataset"
+            ] = f"{data_args.dataset_name} {data_args.dataset_config_name}"
         else:
             kwargs["dataset"] = data_args.dataset_name
         if "common_voice" in data_args.dataset_name:
-            kwargs["language"] = data_args.dataset_config_name
+            kwargs["language"] = data_args.dataset_config_name[:2]
         if model_args.model_index_name is not None:
             kwargs["model_name"] = model_args.model_index_name
 
