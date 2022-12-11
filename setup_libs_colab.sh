@@ -6,7 +6,6 @@ huggingface-cli login
 huggingface-cli repo create $2
 git clone https://huggingface.co/$1/$2
 cd $2
-cp ../run_speech_recognition_seq2seq_streaming.py .
-cp ../run_speech_recognition_seq2seq.py .
-cp ../fine-tune-whisper-non-streaming.ipynb .
-cp ../run.sh .
+cp ../**.py .
+cp ../**.sh .
+cp ../**.ipynb .
