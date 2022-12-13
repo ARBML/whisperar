@@ -41,11 +41,9 @@ class MGDB2Dataset(datasets.GeneratorBasedBuilder):
         description=_DESCRIPTION,
         features=datasets.Features(
             {
-                # "speaker_id": datasets.Value("string"),
                 "path": datasets.Value("string"),
                 "audio": datasets.Audio(sampling_rate=16_000),
                 "text": datasets.Value("string"),
-                # "sentence_bw": datasets.Value("string"),
             }
         ),
         supervised_keys=None,
@@ -55,41 +53,74 @@ class MGDB2Dataset(datasets.GeneratorBasedBuilder):
     )
 
     def _split_generators(self, dl_manager):
-        # prompts_paths = dl_manager.download(_PROMPTS_URLS)
         wav_archive = dl_manager.download(_DATA_URL)
         txt_archive = dl_manager.download(_TEXT_URL)
         test_dir = "dataset/test"
         dev_dir = "dataset/dev"
         train_dir = "dataset/train"
-        return [
-        datasets.SplitGenerator(
-            name=datasets.Split.TEST,
-            gen_kwargs={
-                "path_to_txt": test_dir + "/txt",
-                "path_to_wav": test_dir + "/wav",
-                "wav_files": [dl_manager.iter_archive(wav_archive['test'])],
-                "txt_files": dl_manager.iter_archive(txt_archive['test']),
-            },
-        ),
-        datasets.SplitGenerator(
-            name=datasets.Split.VALIDATION,
-            gen_kwargs={
-                "path_to_txt": dev_dir + "/txt",
-                "path_to_wav": dev_dir + "/wav",
-                "wav_files": [dl_manager.iter_archive(wav_archive['dev'])],
-                "txt_files": dl_manager.iter_archive(txt_archive['dev']),
-            },
-        ),
-        datasets.SplitGenerator(
-            name=datasets.Split.TRAIN,
-            gen_kwargs={
-                "path_to_txt": train_dir + "/txt",
-                "path_to_wav": train_dir + "/wav",
-                "wav_files": [dl_manager.iter_archive(a) for a in wav_archive['train']],
-                "txt_files": dl_manager.iter_archive(txt_archive['train']),
-            },
-        ),
-    ]
+
+        if dl_manager.is_streaming:
+    
+            return [
+            datasets.SplitGenerator(
+                name=datasets.Split.TEST,
+                gen_kwargs={
+                    "path_to_txt": test_dir + "/txt",
+                    "path_to_wav": test_dir + "/wav",
+                    "wav_files": [dl_manager.iter_archive(wav_archive['test'])],
+                    "txt_files": dl_manager.iter_archive(txt_archive['test']),
+                },
+            ),
+            datasets.SplitGenerator(
+                name=datasets.Split.VALIDATION,
+                gen_kwargs={
+                    "path_to_txt": dev_dir + "/txt",
+                    "path_to_wav": dev_dir + "/wav",
+                    "wav_files": [dl_manager.iter_archive(wav_archive['dev'])],
+                    "txt_files": dl_manager.iter_archive(txt_archive['dev']),
+                },
+            ),
+            datasets.SplitGenerator(
+                name=datasets.Split.TRAIN,
+                gen_kwargs={
+                    "path_to_txt": train_dir + "/txt",
+                    "path_to_wav": train_dir + "/wav",
+                    "wav_files": [dl_manager.iter_archive(a) for a in wav_archive['train']],
+                    "txt_files": dl_manager.iter_archive(txt_archive['train']),
+                },
+            ),
+        ]
+        else:
+            return [
+            datasets.SplitGenerator(
+                name=datasets.Split.TEST,
+                gen_kwargs={
+                    "path_to_txt": test_dir + "/txt",
+                    "path_to_wav": test_dir + "/wav",
+                    "wav_files": [dl_manager.extract(wav_archive['test'])],
+                    "txt_files": dl_manager.extract(txt_archive['test']),
+                },
+            ),
+            datasets.SplitGenerator(
+                name=datasets.Split.VALIDATION,
+                gen_kwargs={
+                    "path_to_txt": dev_dir + "/txt",
+                    "path_to_wav": dev_dir + "/wav",
+                    "wav_files": [dl_manager.extract(wav_archive['dev'])],
+                    "txt_files": dl_manager.extract(txt_archive['dev']),
+                },
+            ),
+            datasets.SplitGenerator(
+                name=datasets.Split.TRAIN,
+                gen_kwargs={
+                    "path_to_txt": train_dir + "/txt",
+                    "path_to_wav": train_dir + "/wav",
+                    "wav_files": [dl_manager.extract(a) for a in wav_archive['train']],
+                    "txt_files": dl_manager.extract(txt_archive['train']),
+                },
+            ),
+        ]
+
 
     
     def _generate_examples(self, path_to_txt, path_to_wav, wav_files, txt_files):
@@ -119,5 +150,3 @@ class MGDB2Dataset(datasets.GeneratorBasedBuilder):
                     audio = {"path": path, "bytes": f.read()}
                     yield id_, {**examples[wav_path], "audio": audio}
                     id_ += 1
-                # elif in_wav_dir:
-                #     break
