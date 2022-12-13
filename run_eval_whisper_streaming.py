@@ -1,5 +1,5 @@
 import argparse
-
+import pyarabic.araby as araby
 from transformers import pipeline
 from transformers.models.whisper.english_normalizer import BasicTextNormalizer
 from datasets import load_dataset, Audio
@@ -41,6 +41,11 @@ def normalise(batch):
     return batch
 
 
+def remove_diacritics(batch):
+    batch["norm_text"] = araby.strip_diacritics(get_text(batch))
+    return batch
+
+
 def data(dataset):
     for i, item in enumerate(dataset):
         yield {**item["audio"], "reference": item["norm_text"]}
@@ -50,6 +55,12 @@ def main(args):
     batch_size = args.batch_size
     whisper_asr = pipeline(
         "automatic-speech-recognition", model=args.model_id, device=args.device
+    )
+
+    whisper_asr.model.config.forced_decoder_ids = (
+        whisper_asr.tokenizer.get_decoder_prompt_ids(
+            language=args.language, task="transcribe"
+        )
     )
 
     dataset = load_dataset(
@@ -65,6 +76,9 @@ def main(args):
 
     dataset = dataset.cast_column("audio", Audio(sampling_rate=16000))
     dataset = dataset.map(normalise)
+    if args.remove_diacritics:
+        print("stripping diacritics")
+        dataset = dataset.map(remove_diacritics)
     dataset = dataset.filter(is_target_text_in_range, input_columns=["norm_text"])
 
     predictions = []
@@ -131,8 +145,22 @@ if __name__ == "__main__":
         "--streaming",
         type=bool,
         default=True,
-        help="Choose whether you'd like to download the entire dataset or stream it for evaluation",
+        help="Choose whether you'd like to download the entire dataset or stream it during the evaluation.",
     )
+    parser.add_argument(
+        "--language",
+        type=str,
+        required=True,
+        help="Two letter language code for the transcription language, e.g. use 'en' for English.",
+    )
+
+    parser.add_argument(
+        "--remove_diacritics",
+        type=bool,
+        default=False,
+        help="Choose whether you'd like remove_diacritics",
+    )
+
     args = parser.parse_args()
 
     main(args)
