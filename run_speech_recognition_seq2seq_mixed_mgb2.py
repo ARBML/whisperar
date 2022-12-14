@@ -519,6 +519,8 @@ def main():
             "Make sure that `config.decoder_start_token_id` is correctly defined"
         )
 
+    max_label_length = model.config.max_length
+
     if model_args.freeze_feature_encoder:
         model.freeze_feature_encoder()
 
@@ -606,6 +608,14 @@ def main():
     vectorized_datasets["train"] = vectorized_datasets["train"].filter(
         is_audio_in_length_range,
         input_columns=["input_length"],
+    )
+
+    def filter_labels(labels):
+        """Filter label sequences longer than max length"""
+        return len(labels) < max_label_length
+
+    vectorized_datasets = vectorized_datasets.filter(
+        filter_labels, input_columns=["labels"]
     )
 
     # 8. Load Metric
