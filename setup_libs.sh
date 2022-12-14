@@ -9,4 +9,5 @@ cd $2
 cp ../**.py .
 cp ../**.sh .
 cp ../**.ipynb .
+cp ../ds_config.js .
 wget https://raw.githubusercontent.com/huggingface/community-events/main/whisper-fine-tuning-event/fine-tune-whisper-non-streaming.ipynb

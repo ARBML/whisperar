@@ -9,3 +9,4 @@ cd $2
 cp ../**.py .
 cp ../**.sh .
 cp ../**.ipynb .
+cp ../ds_config.js .

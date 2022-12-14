@@ -26,6 +26,12 @@ cd MODEL_NAME
 bash run_mgb2.sh
 ```
 
+You can also run with deepspeed wich allows running whisper-large v2 with batch size 32 on A100
+
+```
+bash run_mgb2_deepspeed.sh
+```
+
 ## evaluation
  
 ```bash

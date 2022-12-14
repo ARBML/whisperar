@@ -9,3 +9,4 @@ more-itertools
 tensorboard
 bitsandbytes
 sentencepiece
+accelerate deepspeed
