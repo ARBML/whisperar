@@ -26,13 +26,18 @@ cd MODEL_NAME
 bash run_mgb2.sh
 ```
 
-## evaluation 
+## evaluation
+ 
 ```bash
-python evaluate_models.py \
-        --dataset_name google/fleurs\
-        --model_name openai/whisper-tiny\
-        --subset ar_eg\
-        --hf_token hf_**
+python run_eval_whisper_streaming.py \
+        --dataset google/fleurs \
+        --model_id Zaid/whisper-medium-mgb2 \
+        --split test \
+        --config ar_eg \
+        --remove_diacritics="True" \
+        --language="ar" \
+        --device 0 \
+        --streaming="False"
 ```
 
 ## Preparing the MGB2 data
