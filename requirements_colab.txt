@@ -8,3 +8,4 @@ more-itertools
 tensorboard
 bitsandbytes
 accelerate deepspeed
+pyarabic
