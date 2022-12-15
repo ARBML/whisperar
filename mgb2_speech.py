@@ -132,21 +132,38 @@ class MGDB2Dataset(datasets.GeneratorBasedBuilder):
         examples = {}
         id_ = 0
         # need to prepare the transcript - wave map
-        for path, f in txt_files:
-            if path.find(path_to_txt) > -1:
-
-                wav_path = os.path.split(path)[1].replace("_utf8", "").replace(".txt", ".wav").strip()
-
+        for item in txt_files:
+            if type(item) is tuple:
+                # iter_archive will return path and file
+                path, f = item
                 txt = f.read().decode(encoding="utf-8").strip()
+            else:
+                # extract will return path only
+                path = item
+                with open(path, encoding="utf-8") as f:
+                    txt = f.read().strip()
+
+            if path.find(path_to_txt) > -1:
+                # construct the wav path
+                # which is used as an identifier
+                wav_path = os.path.split(path)[1].replace("_utf8", "").replace(".txt", ".wav").strip()
+                
                 examples[wav_path] = {
                     "text": txt,
                     "path": wav_path,
                 }
 
         for wf in wav_files:
-            for path, f in wf:
+            for item in wf:
+                if type(item) is tuple:
+                    path, f = item
+                    wav_data = f.read()
+                else:
+                    path = item
+                    with open(path, "rb") as f:
+                        wav_data = f.read()
                 if path.find(path_to_wav) > -1:
                     wav_path = os.path.split(path)[1].strip()
-                    audio = {"path": path, "bytes": f.read()}
+                    audio = {"path": path, "bytes": wav_data}
                     yield id_, {**examples[wav_path], "audio": audio}
                     id_ += 1
