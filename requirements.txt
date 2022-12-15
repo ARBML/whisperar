@@ -10,3 +10,4 @@ tensorboard
 bitsandbytes
 sentencepiece
 accelerate deepspeed
+pyarabic
