@@ -1,4 +1,4 @@
-!python run_eval_whisper_streaming.py \
+python run_eval_whisper_streaming.py \
         --dataset google/fleurs \
         --model_id $1 \
         --split test \

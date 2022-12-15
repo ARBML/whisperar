@@ -1,4 +1,4 @@
-!python run_eval_whisper_streaming.py \
+python run_eval_whisper_streaming.py \
         --dataset mozilla-foundation/common_voice_11_0 \
         --model_id $1 \
         --split test \
