@@ -3,7 +3,7 @@ python run_speech_recognition_seq2seq_mixed_mgb2.py \
 --dataset_name="arbml/mgb2_speech" \
 --dataset_config_name="ar" \
 --language="Arabic" \
---train_split_name="train+validation" \
+--train_split_name="train" \
 --eval_split_name="test" \
 --model_index_name="Whisper Small Arabic" \
 --max_steps="5000" \
