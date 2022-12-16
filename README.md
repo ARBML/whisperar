@@ -32,19 +32,21 @@ You can also run with deepspeed wich allows running whisper-large v2 with batch 
 bash run_mgb2_deepspeed.sh
 ```
 
-## evaluation
- 
-```bash
-python run_eval_whisper_streaming.py \
-        --dataset google/fleurs \
-        --model_id Zaid/whisper-medium-mgb2 \
-        --split test \
-        --config ar_eg \
-        --remove_diacritics="True" \
-        --language="ar" \
-        --device 0 \
-        --streaming="False"
+## Evaluation
+
+### Evaluation on Fleurs
+
 ```
+bash run_eval_fleurs.sh MODEL_NAME
+```
+
+### Evaluation on Common Voice 11
+
+```
+bash run_eval_cv_11.sh MODEL_NAME
+```
+
+
 
 evaluate on common voice 11 
 
