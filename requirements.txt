@@ -9,5 +9,6 @@ more-itertools
 tensorboard
 bitsandbytes
 sentencepiece
-accelerate deepspeed
+accelerate 
+deepspeed
 pyarabic

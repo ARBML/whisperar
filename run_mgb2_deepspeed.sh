@@ -1,6 +1,6 @@
 deepspeed run_speech_recognition_seq2seq_mixed_mgb2.py \
 --model_name_or_path="openai/whisper-small" \
---deepspeed="ds_config.json"
+--deepspeed="ds_config.json" \
 --dataset_name="arbml/mgb2_speech" \
 --dataset_config_name="ar" \
 --language="Arabic" \
