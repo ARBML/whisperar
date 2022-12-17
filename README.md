@@ -46,20 +46,6 @@ bash run_eval_fleurs.sh MODEL_NAME
 bash run_eval_cv_11.sh MODEL_NAME
 ```
 
-
-
-evaluate on common voice 11 
-
-```bash
-bash run_eval_cv_11.sh HF_USER_NAME/MODEL_NAME
-```
-
-evaluate on Fleurs
-
-```bash
-bash run_eval_fleurs.sh HF_USER_NAME/MODEL_NAME
-```
-
 ## Preparing the MGB2 data
 
 While MGB2 dataset contains a richly transcribed speech dataset, the wav files were too lengthy to be used to train the whisper model. Therefore, we had to split the wave file and still maintain the correct correspondence with the transcribed text.
