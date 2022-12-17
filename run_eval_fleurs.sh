@@ -4,7 +4,6 @@ python run_eval_whisper_streaming.py \
         --split test \
         --config ar_eg \
         --batch_size="16" \
-        --remove_diacritics="True" \
+        --remove_diacritics \
         --language="ar" \
-        --device 0 \
-        --streaming="False"
+        --device 0

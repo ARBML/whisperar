@@ -143,8 +143,8 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--streaming",
-        type=bool,
         default=True,
+        action="store_true",
         help="Choose whether you'd like to download the entire dataset or stream it during the evaluation.",
     )
     parser.add_argument(
@@ -156,8 +156,8 @@ if __name__ == "__main__":
 
     parser.add_argument(
         "--remove_diacritics",
-        type=bool,
         default=False,
+        action="store_true",
         help="Choose whether you'd like remove_diacritics",
     )
 
