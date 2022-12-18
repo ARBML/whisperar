@@ -1,0 +1,38 @@
+python run_speech_recognition_seq2seq_interleaved.py \
+--model_name_or_path="openai/whisper-medium" \
+--dataset_name="arbml/mgb2_speech|mozilla-foundation/common_voice_11_0" \
+--dataset_config_name="ar|ar" \
+--text_column_name="text|sentence" \
+--train_split_name="train|train" \
+--eval_split_name="validation|validation" \
+--language="Arabic" \
+--model_index_name="Whisper Small Arabic" \
+--max_steps="20000" \
+--output_dir="./" \
+--per_device_train_batch_size="64" \
+--per_device_eval_batch_size="8" \
+--logging_steps="25" \
+--learning_rate="1e-5" \
+--warmup_steps="500" \
+--evaluation_strategy="steps" \
+--eval_steps="1000" \
+--save_strategy="steps" \
+--save_steps="1000" \
+--generation_max_length="225" \
+--length_column_name="input_length" \
+--max_duration_in_seconds="30" \
+--freeze_feature_encoder="False" \
+--report_to="tensorboard" \
+--metric_for_best_model="wer" \
+--greater_is_better="False" \
+--load_best_model_at_end \
+--gradient_checkpointing \
+--fp16 \
+--overwrite_output_dir \
+--optim="adamw_bnb_8bit" \
+--do_train \
+--do_eval \
+--predict_with_generate \
+--do_normalize_eval \
+--use_auth_token \
+--push_to_hub

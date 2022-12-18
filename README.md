@@ -21,16 +21,38 @@ bash setup_libs.sh HF_USER_NAME MODEL_NAME
 
 After that, you can run training by 
 
+## for mgb2
+
 ```
 cd MODEL_NAME
 bash run_mgb2.sh
 ```
+**note:** open run_mgb2.sh and modify parameters to match your experiment.
 
 You can also run with deepspeed wich allows running whisper-large v2 with batch size 32 on A100
 
 ```
 bash run_mgb2_deepspeed.sh
 ```
+
+### For training using interleaved data from multiple datasets
+
+1. Open `run_train.sh` using and editor
+2. Modify the parameters to match your experiment
+    Use `|` to add datasets and `+` to combine splits.
+
+    **Remember,* the number of text columns, splits, and configurations must match the number of data sets.
+
+    **For example:** if you have `mozilla/common_voice_11|arbml/mgb2_speech`
+
+    Then you must set configuration to be `ar|ar`
+
+    and splits to be `train|train` or `train+validation|train` if you want to mix train and validation
+
+    and test columns to be `sentence|text`
+3. run `bash run_train.sh` using screen or mutex
+
+
 
 ## Evaluation
 
