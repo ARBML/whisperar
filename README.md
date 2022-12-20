@@ -22,9 +22,11 @@ bash setup_libs.sh HF_USER_NAME MODEL_NAME
 After that, you can run training by 
 
 ## Datasets 
+
 * [MGB2](https://arabicspeech.org/mgb2/)
 * [Common Voice 11](https://huggingface.co/datasets/mozilla-foundation/common_voice_11_0)
 * [Fleurs](https://huggingface.co/datasets/google/fleurs)
+
 ## for mgb2
 
 ```
@@ -128,3 +130,6 @@ The loading script determines the features of the data based on split and select
 1. Go through all the entries in the archive containing the text transcripts and create a map where the name of the file (the 64base encoded one) is used as the key and the transcript at the value
 2. Iterate through all the wav files in all the archive, and for every wav file, get the corresponding transcript from the map constructed in previous step (using the file name) and yield the wav file, transcript, and path to the wav file
 
+## Acknowledgments 
+
+Thanks for HuggingFace for running the event and Lambda for providing the compute. Most of the experiments were run on A100 machines. 
