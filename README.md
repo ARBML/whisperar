@@ -21,6 +21,10 @@ bash setup_libs.sh HF_USER_NAME MODEL_NAME
 
 After that, you can run training by 
 
+## Datasets 
+* [MGB2](https://arabicspeech.org/mgb2/)
+* [Common Voice 11](https://huggingface.co/datasets/mozilla-foundation/common_voice_11_0)
+* [Fleurs](https://huggingface.co/datasets/google/fleurs)
 ## for mgb2
 
 ```
@@ -75,10 +79,10 @@ bash run_eval_cv_11.sh MODEL_NAME
 |[small](https://huggingface.co/openai/small)| - |-|600 hrs|30.11|53.22|
 |[medium](https://huggingface.co/openai/whisper-medium) |- | -|600 hrs|19.10|45.31|
 |[large v2](https://huggingface.co/openai/whisper-large-v2)| -|-| 600 hrs |17.14|39.19|
-|[small-cv-ar](https://huggingface.co/arbml/whisper-small-cv-ar)|[Demo](https://huggingface.co/spaces/arbml/whisper-small-cv-ar) |CV11| ~ 100 hrs |91.34|22.38 *|
+|[small-cv-ar](https://huggingface.co/arbml/whisper-small-cv-ar)|[Demo](https://huggingface.co/spaces/arbml/whisper-small-cv-ar) |CV11| ~ 100 hrs |91.34|**22.38** *|
 |[small-ar](https://huggingface.co/malmarz/whisper_small_s10k_b64_nofreeze)|[Demo](https://huggingface.co/spaces/arbml/whisper-small-almarzouq)| MGB2 | 1200 hrs |16.69|43.13|
-|[medium-ar](https://huggingface.co/arbml/whisper-medium-ar)|[Demo](https://huggingface.co/spaces/arbml/whisper-medium-ar)| MGB2| 1200 hrs | 12.04 | **34.28**|
-|[largev2](https://huggingface.co/arbml/whisper-largev2-ar)| [Demo](https://huggingface.co/spaces/arbml/whisper-largev2-ar)| MGB2| 1200 hrs  | **11.60** | 38.23|
+|[medium-ar](https://huggingface.co/arbml/whisper-medium-ar)|[Demo](https://huggingface.co/spaces/arbml/whisper-medium-ar)| MGB2| 1200 hrs | 12.04 | 34.28|
+|[largev2.1](https://huggingface.co/arbml/whisper-largev2-ar)| [Demo](https://huggingface.co/spaces/arbml/whisper-largev2-ar)| MGB2| 1200 hrs  | **11.60** | 38.23|
 
 _* might indicate overvitting because the model is evaluated on the same validation dataset_
 
