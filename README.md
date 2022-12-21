@@ -1,4 +1,6 @@
-# whisper_sprint
+# Whisperar
+
+A set of finetuned whisper models from openai on Arabic.
 
 ## training 
 
