@@ -4,6 +4,7 @@ from transformers import pipeline
 from transformers.models.whisper.english_normalizer import BasicTextNormalizer
 from datasets import load_dataset, Audio
 import evaluate
+from tqdm import tqdm
 
 wer_metric = evaluate.load("wer")
 
@@ -70,9 +71,12 @@ def main(args):
         streaming=args.streaming,
         use_auth_token=True,
     )
-
     # Only uncomment for debugging
-    dataset = dataset.take(args.max_eval_samples)
+    if args.streaming:
+        dataset = dataset.take(args.max_eval_samples)
+    else:
+        if args.max_eval_samples is not None:
+            dataset = dataset.select(args.max_eval_samples)
 
     dataset = dataset.cast_column("audio", Audio(sampling_rate=16000))
     dataset = dataset.map(normalise)
@@ -85,10 +89,19 @@ def main(args):
     references = []
 
     # run streamed inference
-    for out in whisper_asr(data(dataset), batch_size=batch_size):
-        predictions.append(whisper_norm(out["text"]))
-        references.append(out["reference"][0])
+    if not args.streaming:
+        pbar = tqdm(total=len(dataset))
 
+    for out in whisper_asr(data(dataset), batch_size=batch_size):
+        if args.remove_diacritics:
+            predictions.append(araby.strip_diacritics(whisper_norm(out["text"])))
+        else:
+            predictions.append(whisper_norm(out["text"]))
+        references.append(out["reference"][0])
+        if not args.streaming:
+            pbar.update(1)
+    if not args.streaming:
+        pbar.close()
     wer = wer_metric.compute(references=references, predictions=predictions)
     wer = round(100 * wer, 2)
 
@@ -143,7 +156,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--streaming",
-        default=True,
+        default=False,
         action="store_true",
         help="Choose whether you'd like to download the entire dataset or stream it during the evaluation.",
     )
