@@ -4,7 +4,7 @@ from transformers import pipeline
 from transformers.models.whisper.english_normalizer import BasicTextNormalizer
 from datasets import load_dataset, Audio
 import evaluate
-from tqdm import tqdm
+from tqdm.auto import tqdm
 
 wer_metric = evaluate.load("wer")
 
@@ -38,7 +38,7 @@ whisper_norm = BasicTextNormalizer()
 
 
 def normalise(batch):
-    batch["norm_text"] = whisper_norm(get_text(batch))
+    batch["norm_text"] = get_text(batch)
     return batch
 
 
@@ -76,13 +76,10 @@ def main(args):
         dataset = dataset.take(args.max_eval_samples)
     else:
         if args.max_eval_samples is not None:
-            dataset = dataset.select(args.max_eval_samples)
+            dataset = dataset.select(range(args.max_eval_samples))
 
     dataset = dataset.cast_column("audio", Audio(sampling_rate=16000))
     dataset = dataset.map(normalise)
-    if args.remove_diacritics:
-        print("stripping diacritics")
-        dataset = dataset.map(remove_diacritics)
     dataset = dataset.filter(is_target_text_in_range, input_columns=["norm_text"])
 
     predictions = []
@@ -93,11 +90,21 @@ def main(args):
         pbar = tqdm(total=len(dataset))
 
     for out in whisper_asr(data(dataset), batch_size=batch_size):
+
+        pred = out["text"]
+        true = out["reference"][0]
+
         if args.remove_diacritics:
-            predictions.append(araby.strip_diacritics(whisper_norm(out["text"])))
-        else:
-            predictions.append(whisper_norm(out["text"]))
-        references.append(out["reference"][0])
+            pred = araby.strip_diacritics(pred)
+            true = araby.strip_diacritics(true)
+
+        if args.normalise:
+            pred = whisper_norm(pred)
+            true = whisper_norm(true)
+
+        predictions.append(pred)
+        references.append(true)
+
         if not args.streaming:
             pbar.update(1)
     if not args.streaming:
@@ -172,6 +179,13 @@ if __name__ == "__main__":
         default=False,
         action="store_true",
         help="Choose whether you'd like remove_diacritics",
+    )
+
+    parser.add_argument(
+        "--normalise",
+        default=False,
+        action="store_true",
+        help="Choose whether you'd like whisper norm",
     )
 
     args = parser.parse_args()
